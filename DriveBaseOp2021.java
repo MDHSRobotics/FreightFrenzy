@@ -2,6 +2,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -19,6 +22,8 @@ public class DriveBaseOp2021 extends LinearOpMode {
   private DcMotor intake;
   private Servo claw;
 
+  private DistanceSensor cdv3_DistanceSensor;
+  private ColorSensor cdv3;
   /**
    * This function is executed when this Op Mode is selected from the Driver Station.
    */
@@ -39,6 +44,9 @@ public class DriveBaseOp2021 extends LinearOpMode {
     vert = hardwareMap.get(DcMotor.class, "vert");
     claw = hardwareMap.get(Servo.class, "claw");
     intake = hardwareMap.get(DcMotor.class, "intake");
+    cdv3_DistanceSensor = hardwareMap.get(DistanceSensor.class, "cdv3");
+    cdv3 = hardwareMap.get(ColorSensor.class, "cdv3");
+    
 
     // Put initialization blocks here.
     waitForStart();
@@ -94,8 +102,8 @@ public class DriveBaseOp2021 extends LinearOpMode {
           intake.setPower(0);
         }
         
-        
         telemetry.addData("motor", rot.getCurrentPosition());
+        telemetry.addData("distance", cdv3_DistanceSensor.getDistance(DistanceUnit.CM));
         telemetry.update();
       }
     }
