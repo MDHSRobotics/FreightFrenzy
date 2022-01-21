@@ -32,12 +32,11 @@ public class Autonomous extends LinearOpMode {
     double newmotorpos;
     double drivepos;
     double voltage;
-    double mult = 1;
     int pos = 1;
     int level = 0;
     
     frontsensor = hardwareMap.get(DistanceSensor.class, "frontsensor");
-    backsensor = hardwareMap.get(DistanceSensor.class, "frontsensor");
+    backsensor = hardwareMap.get(DistanceSensor.class, "backsensor");
     FR = hardwareMap.get(DcMotor.class, "FR");
     FL = hardwareMap.get(DcMotor.class, "FL");
     BL = hardwareMap.get(DcMotor.class, "BL");
@@ -54,44 +53,43 @@ public class Autonomous extends LinearOpMode {
       voltage = ControlHub_VoltageSensor.getVoltage();
       motorpos = rot.getCurrentPosition();
       newmotorpos = motorpos - 470;
-      drivepos = FR.getCurrentPosition();
       
-      if(voltage < 13){
-        mult = (13-voltage) + 1;
-      }
       
       if (pos == 1){
-        forward(200, mult);
+        forward(200);
         sleep(100);
         right(580);
         sleep(100);
-        back(440);
+        back(480);
         sleep(500);
         ducksgo();
         sleep(6000);
         ducksstop();
         sleep(100);
-        forward(210, mult);
+        forward(210);
         left(600);
         sleep(100);
-        forward(130, mult);
+        forward(120);
         sleep(400);
         
-        if(frontsensor.getDistance(DistanceUnit.CM) < 100){
+        if(frontsensor.getDistance(DistanceUnit.CM) < 50){
           level = 1;
         }
+        telemetry.addData("d1", frontsensor.getDistance(DistanceUnit.CM));
         sleep(200);
         straferight(300);
         sleep(200);
-        if(frontsensor.getDistance(DistanceUnit.CM) < 100){
+        if(frontsensor.getDistance(DistanceUnit.CM) < 50){
           level = 2;
         }
+        telemetry.addData("d1", frontsensor.getDistance(DistanceUnit.CM));
         sleep(200);
         straferight(300);
         sleep(200);
-        if(frontsensor.getDistance(DistanceUnit.CM) < 100){
+        if(frontsensor.getDistance(DistanceUnit.CM) < 50){
           level = 3;
         }
+        telemetry.addData("d1", frontsensor.getDistance(DistanceUnit.CM));
         telemetry.addData("level", level);
         telemetry.update();
         sleep(200);
@@ -102,7 +100,7 @@ public class Autonomous extends LinearOpMode {
           sleep(100);
           rightpos(newmotorpos);
           sleep(500);
-          forward(80, mult);
+          forward(80);
           sleep(200);
           claw.setPosition(1);
           sleep(2000);
@@ -110,9 +108,9 @@ public class Autonomous extends LinearOpMode {
           back(100);
           leftpos(motorpos);
           left(480);
-          forward(900, mult);
+          forward(900);
           left(170);
-          forward(500, mult);
+          forward(500);
         
         }else if(level == 2){
           l2();
@@ -121,7 +119,7 @@ public class Autonomous extends LinearOpMode {
           sleep(100);
           rightpos(newmotorpos);
           sleep(500);
-          forward(100, mult);
+          forward(100);
           sleep(200);
           claw.setPosition(1);
           sleep(2000);
@@ -129,9 +127,9 @@ public class Autonomous extends LinearOpMode {
           back(250);
           leftpos(motorpos);
           left(480);
-          forward(1200, mult);
+          forward(1200);
           left(170);
-          forward(360, mult);
+          forward(360);
           sleep(100);
           straferight(500);
           
@@ -143,7 +141,7 @@ public class Autonomous extends LinearOpMode {
           sleep(100);
           rightpos(newmotorpos);
           sleep(500);
-          forward(150, mult);
+          forward(150);
           sleep(200);
           claw.setPosition(1);
           sleep(2000);
@@ -151,9 +149,9 @@ public class Autonomous extends LinearOpMode {
           back(300);
           leftpos(motorpos);
           left(480);
-          forward(1200, mult);
+          forward(1200);
           left(170);
-          forward(290, mult);
+          forward(290);
           sleep(100);
           straferight(70);
         }else{
@@ -161,7 +159,7 @@ public class Autonomous extends LinearOpMode {
           sleep(100);
           rightpos(newmotorpos);
           sleep(500);
-          forward(80, mult);
+          forward(80);
           sleep(200);
           claw.setPosition(1);
           sleep(2000);
@@ -169,14 +167,14 @@ public class Autonomous extends LinearOpMode {
           back(100);
           leftpos(motorpos);
           left(480);
-          forward(900, mult);
+          forward(900);
           left(170);
-          forward(500, mult);
+          forward(50);
         }
       
         
       }else if(pos == 4){
-        forward(150, mult);
+        forward(150);
         sleep(100);
         straferight(900);
         duckie.setPosition(1);
@@ -185,7 +183,7 @@ public class Autonomous extends LinearOpMode {
         strafeleft(630);
         right(10);
         sleep(100);
-        forward(175, mult);
+        forward(175);
         sleep(400);
         
         if(frontsensor.getDistance(DistanceUnit.CM) < 3.9){
@@ -212,7 +210,7 @@ public class Autonomous extends LinearOpMode {
           sleep(100);
           rightpos(newmotorpos);
           sleep(500);
-          forward(80, mult);
+          forward(80);
           sleep(200);
           claw.setPosition(1);
           sleep(2000);
@@ -220,9 +218,9 @@ public class Autonomous extends LinearOpMode {
           back(100);
           leftpos(motorpos);
           right(700);
-          forward(400, mult);
+          forward(400);
           left(170);
-          forward(500, mult);
+          forward(500);
         }
       }
       
@@ -231,7 +229,6 @@ public class Autonomous extends LinearOpMode {
       
       
       while (opModeIsActive()) {
-        telemetry.addData("pos2", drivepos);
         telemetry.addData("Front", frontsensor.getDistance(DistanceUnit.CM));
         telemetry.addData("Back", backsensor.getDistance(DistanceUnit.CM));
         telemetry.addData("level", level);
@@ -241,11 +238,11 @@ public class Autonomous extends LinearOpMode {
     }
   }
   //Movement
-  private void forward(long t, double mult) {
-    BL.setPower(0.5 * mult);
-    BR.setPower(-0.5 * mult);
-    FL.setPower(0.5 * mult);
-    FR.setPower(-0.5 * mult);
+  private void forward(long t) {
+    BL.setPower(0.5);
+    BR.setPower(-0.5);
+    FL.setPower(0.5);
+    FR.setPower(-0.5);
     sleep(t);
     stopmove();
   }
