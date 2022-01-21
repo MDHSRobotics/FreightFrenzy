@@ -5,11 +5,12 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name = "Autonomous", group = "")
+@TeleOp
 public class Autonomous extends LinearOpMode {
   private DcMotor FR;
   private DcMotor FL;
@@ -21,18 +22,22 @@ public class Autonomous extends LinearOpMode {
   private Servo claw;
   private Servo duckie;
   
-  private DistanceSensor cdv3_DistanceSensor;
-  private ColorSensor cdv3;
+  private DistanceSensor frontsensor;
+  private DistanceSensor backsensor;
+  private VoltageSensor ControlHub_VoltageSensor;
   
   @Override
   public void runOpMode() {
     double motorpos;
     double newmotorpos;
+    double drivepos;
+    double voltage;
+    double mult = 1;
     int pos = 1;
     int level = 0;
     
-    cdv3_DistanceSensor = hardwareMap.get(DistanceSensor.class, "cdv3");
-    cdv3 = hardwareMap.get(ColorSensor.class, "cdv3");
+    frontsensor = hardwareMap.get(DistanceSensor.class, "frontsensor");
+    backsensor = hardwareMap.get(DistanceSensor.class, "frontsensor");
     FR = hardwareMap.get(DcMotor.class, "FR");
     FL = hardwareMap.get(DcMotor.class, "FL");
     BL = hardwareMap.get(DcMotor.class, "BL");
@@ -41,71 +46,96 @@ public class Autonomous extends LinearOpMode {
     rot = hardwareMap.get(DcMotor.class, "rot");
     duckie = hardwareMap.get(Servo.class, "duckie");
     claw = hardwareMap.get(Servo.class, "claw");
+    ControlHub_VoltageSensor = hardwareMap.get(VoltageSensor.class, "Control Hub");
     // Put initialization blocks here.
     waitForStart();
     if (opModeIsActive()) {
       // Put run blocks here
+      voltage = ControlHub_VoltageSensor.getVoltage();
       motorpos = rot.getCurrentPosition();
       newmotorpos = motorpos - 470;
+      drivepos = FR.getCurrentPosition();
+      
+      if(voltage < 13){
+        mult = (13-voltage) + 1;
+      }
       
       if (pos == 1){
-        forward(200);
+        forward(200, mult);
         sleep(100);
         right(580);
         sleep(100);
-        back(490);
-        sleep(1000);
+        back(440);
+        sleep(500);
         ducksgo();
-        sleep(5600);
+        sleep(6000);
         ducksstop();
-        sleep(200);
-        forward(230);
         sleep(100);
+        forward(210, mult);
         left(600);
         sleep(100);
-        forward(125);
-        sleep(500);
-        if(cdv3_DistanceSensor.getDistance(DistanceUnit.CM) < 3.8){
+        forward(130, mult);
+        sleep(400);
+        
+        if(frontsensor.getDistance(DistanceUnit.CM) < 100){
           level = 1;
         }
         sleep(200);
         straferight(300);
         sleep(200);
-        if(cdv3_DistanceSensor.getDistance(DistanceUnit.CM) < 3.8){
+        if(frontsensor.getDistance(DistanceUnit.CM) < 100){
           level = 2;
         }
         sleep(200);
         straferight(300);
         sleep(200);
-        sleep(100);
-        if(cdv3_DistanceSensor.getDistance(DistanceUnit.CM) < 3.8){
+        if(frontsensor.getDistance(DistanceUnit.CM) < 100){
           level = 3;
         }
+        telemetry.addData("level", level);
+        telemetry.update();
         sleep(200);
         straferight(480);
-        sleep(500);
+        
         if(level == 1){
-          straferight(250);
+          straferight(240);
           sleep(100);
           rightpos(newmotorpos);
           sleep(500);
-          forward(100);
+          forward(80, mult);
           sleep(200);
           claw.setPosition(1);
-          sleep(3000);
+          sleep(2000);
           claw.setPosition(0.5);
+          back(100);
+          leftpos(motorpos);
+          left(480);
+          forward(900, mult);
+          left(170);
+          forward(500, mult);
+        
         }else if(level == 2){
           l2();
-          sleep(1000);
+          sleep(200);
           straferight(250);
           sleep(100);
           rightpos(newmotorpos);
           sleep(500);
-          forward(100);
+          forward(100, mult);
           sleep(200);
           claw.setPosition(1);
-          sleep(3000);
+          sleep(2000);
           claw.setPosition(0.5);
+          back(250);
+          leftpos(motorpos);
+          left(480);
+          forward(1200, mult);
+          left(170);
+          forward(360, mult);
+          sleep(100);
+          straferight(500);
+          
+        
         }else if (level == 3){
           l3();
           sleep(200);
@@ -113,27 +143,87 @@ public class Autonomous extends LinearOpMode {
           sleep(100);
           rightpos(newmotorpos);
           sleep(500);
-          forward(150);
+          forward(150, mult);
           sleep(200);
           claw.setPosition(1);
-          sleep(3000);
+          sleep(2000);
           claw.setPosition(0.5);
+          back(300);
+          leftpos(motorpos);
+          left(480);
+          forward(1200, mult);
+          left(170);
+          forward(290, mult);
+          sleep(100);
+          straferight(70);
+        }else{
+          straferight(240);
+          sleep(100);
+          rightpos(newmotorpos);
+          sleep(500);
+          forward(80, mult);
+          sleep(200);
+          claw.setPosition(1);
+          sleep(2000);
+          claw.setPosition(0.5);
+          back(100);
+          leftpos(motorpos);
+          left(480);
+          forward(900, mult);
+          left(170);
+          forward(500, mult);
         }
-        back(300);
-        left(500);
-        forward(1200);
-        ducksstop();
+      
         
       }else if(pos == 4){
-        forward(150);
+        forward(150, mult);
         sleep(100);
         straferight(900);
         duckie.setPosition(1);
-        sleep(5800);
+        sleep(6000);
         ducksstop();
-        forward(500);
-      
+        strafeleft(630);
+        right(10);
+        sleep(100);
+        forward(175, mult);
+        sleep(400);
         
+        if(frontsensor.getDistance(DistanceUnit.CM) < 3.9){
+          level = 3;
+        }
+        sleep(200);
+        strafeleft(300);
+        sleep(200);
+        if(frontsensor.getDistance(DistanceUnit.CM) < 3.9){
+          level = 2;
+        }
+        sleep(200);
+        strafeleft(300);
+        sleep(200);
+        if(frontsensor.getDistance(DistanceUnit.CM) < 3.9){
+          level = 1;
+        }
+        telemetry.addData("level", level);
+        telemetry.update();
+        sleep(200);
+        strafeleft(480);
+       if(level == 1){
+          strafeleft(200);
+          sleep(100);
+          rightpos(newmotorpos);
+          sleep(500);
+          forward(80, mult);
+          sleep(200);
+          claw.setPosition(1);
+          sleep(2000);
+          claw.setPosition(0.5);
+          back(100);
+          leftpos(motorpos);
+          right(700);
+          forward(400, mult);
+          left(170);
+          forward(500, mult);
+        }
       }
       
       
@@ -141,21 +231,21 @@ public class Autonomous extends LinearOpMode {
       
       
       while (opModeIsActive()) {
-        
-        telemetry.addData("Distance Inch", cdv3_DistanceSensor.getDistance(DistanceUnit.CM));
-        telemetry.addData("red", cdv3.red());
+        telemetry.addData("pos2", drivepos);
+        telemetry.addData("Front", frontsensor.getDistance(DistanceUnit.CM));
+        telemetry.addData("Back", backsensor.getDistance(DistanceUnit.CM));
         telemetry.addData("level", level);
-        telemetry.addData("motorpos", newmotorpos);
+        telemetry.addData("key", ControlHub_VoltageSensor.getVoltage());
         telemetry.update();
       }
     }
   }
   //Movement
-  private void forward(long t) {
-    BL.setPower(0.5);
-    BR.setPower(-0.5);
-    FL.setPower(0.5);
-    FR.setPower(-0.5);
+  private void forward(long t, double mult) {
+    BL.setPower(0.5 * mult);
+    BR.setPower(-0.5 * mult);
+    FL.setPower(0.5 * mult);
+    FR.setPower(-0.5 * mult);
     sleep(t);
     stopmove();
   }
@@ -225,12 +315,12 @@ public class Autonomous extends LinearOpMode {
   }
   private void l2(){
     up();
-    sleep(550);
+    sleep(600);
     stopvert();
   }
   private void l3(){
     up();
-    sleep(2000);
+    sleep(3200);
     stopvert();
   }
   //Rotation
