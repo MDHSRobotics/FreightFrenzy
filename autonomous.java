@@ -56,11 +56,20 @@ public class Autonomous extends LinearOpMode {
       
       
       if (pos == 1){
-        forward(200);
+        //forward(200);
+        while(backsensor.getDistance(DistanceUnit.CM) < 13 && opModeIsActive()){
+          forwardd();
+        }
+        stopmove();
         sleep(100);
-        right(580);
+        right(560);
         sleep(100);
-        back(480);
+        while(backsensor.getDistance(DistanceUnit.CM) > 40 && opModeIsActive()){
+          backd();
+          telemetry.addData("back",backsensor.getDistance(DistanceUnit.CM));
+          telemetry.update();
+        }
+        stopmove();
         sleep(500);
         ducksgo();
         sleep(6000);
@@ -174,16 +183,16 @@ public class Autonomous extends LinearOpMode {
       
         
       }else if(pos == 4){
-        forward(150);
+        forward(100);
         sleep(100);
-        straferight(900);
+        straferight(796);
         duckie.setPosition(1);
-        sleep(6000);
+        sleep(7000);
         ducksstop();
-        strafeleft(630);
+        strafeleft(660);
         right(10);
         sleep(100);
-        forward(175);
+        forward(165);
         sleep(400);
         
         if(frontsensor.getDistance(DistanceUnit.CM) < 3.9){
@@ -221,6 +230,40 @@ public class Autonomous extends LinearOpMode {
           forward(400);
           left(170);
           forward(500);
+        }else if(level == 2){
+          strafeleft(200);
+          sleep(100);
+          l2();
+          sleep(200);
+          rightpos(newmotorpos);
+          sleep(500);
+          forward(80);
+          sleep(200);
+          claw.setPosition(1);
+          sleep(2000);
+          claw.setPosition(0.5);
+          back(100);
+          leftpos(motorpos);
+          right(700);
+          forward(400);
+          left(170);
+          forward(700);
+        }else{
+          strafeleft(200);
+          sleep(100);
+          rightpos(newmotorpos);
+          sleep(500);
+          forward(80);
+          sleep(200);
+          claw.setPosition(1);
+          sleep(2000);
+          claw.setPosition(0.5);
+          back(100);
+          leftpos(motorpos);
+          right(700);
+          forward(400);
+          left(170);
+          forward(700);
         }
       }
       
@@ -246,6 +289,12 @@ public class Autonomous extends LinearOpMode {
     sleep(t);
     stopmove();
   }
+  private void forwardd() {
+    BL.setPower(0.5);
+    BR.setPower(-0.5);
+    FL.setPower(0.5);
+    FR.setPower(-0.5);
+  }
   private void back(long t) {
     BL.setPower(-0.5);
     BR.setPower(0.5);
@@ -253,6 +302,12 @@ public class Autonomous extends LinearOpMode {
     FR.setPower(0.5);
     sleep(t);
     stopmove();
+  }
+  private void backd() {
+    BL.setPower(-0.3);
+    BR.setPower(0.3);
+    FL.setPower(-0.3);
+    FR.setPower(0.3);
   }
   private void left(long t) {
     BL.setPower(-0.5);
