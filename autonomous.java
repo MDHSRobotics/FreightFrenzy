@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -26,13 +27,14 @@ public class Autonomous extends LinearOpMode {
   private DistanceSensor backsensor;
   private VoltageSensor ControlHub_VoltageSensor;
   
+  
   @Override
   public void runOpMode() {
     double motorpos;
     double newmotorpos;
     double drivepos;
     double voltage;
-    int pos = 1;
+    int pos = 2;
     int level = 0;
     
     frontsensor = hardwareMap.get(DistanceSensor.class, "frontsensor");
@@ -62,25 +64,28 @@ public class Autonomous extends LinearOpMode {
         }
         stopmove();
         sleep(100);
-        right(560);
+        right(540);
         sleep(100);
-        while(backsensor.getDistance(DistanceUnit.CM) > 40 && opModeIsActive()){
-          backd();
-          telemetry.addData("back",backsensor.getDistance(DistanceUnit.CM));
-          telemetry.update();
-        }
-        stopmove();
-        sleep(500);
+        backd();
+        sleep(1150);
+        BL.setPower(-0.1);
+        BR.setPower(0.1);
+        FL.setPower(-0.1);
+        FR.setPower(0.1);
         ducksgo();
         sleep(6000);
         ducksstop();
+        stopmove();
         sleep(100);
-        forward(210);
-        left(600);
+        forward(260);
+        stopmove();
+        sleep(100);
+        left(540);
         sleep(100);
         forward(120);
         sleep(400);
-        
+        telemetry.addData("dist", backsensor.getDistance(DistanceUnit.CM));
+        telemetry.update();
         if(frontsensor.getDistance(DistanceUnit.CM) < 50){
           level = 1;
         }
@@ -195,19 +200,19 @@ public class Autonomous extends LinearOpMode {
         forward(165);
         sleep(400);
         
-        if(frontsensor.getDistance(DistanceUnit.CM) < 3.9){
+        if(frontsensor.getDistance(DistanceUnit.CM) < 50){
           level = 3;
         }
         sleep(200);
         strafeleft(300);
         sleep(200);
-        if(frontsensor.getDistance(DistanceUnit.CM) < 3.9){
+        if(frontsensor.getDistance(DistanceUnit.CM) < 50){
           level = 2;
         }
         sleep(200);
         strafeleft(300);
         sleep(200);
-        if(frontsensor.getDistance(DistanceUnit.CM) < 3.9){
+        if(frontsensor.getDistance(DistanceUnit.CM) < 50){
           level = 1;
         }
         telemetry.addData("level", level);
@@ -265,6 +270,23 @@ public class Autonomous extends LinearOpMode {
           left(170);
           forward(700);
         }
+      }else if(pos == 2){
+        forward(270);
+        sleep(100);
+        straferight(150);
+        if(frontsensor.getDistance(DistanceUnit.CM) < 50){
+          level = 2;
+        }
+        sleep(200);
+        strafeleft(300);
+        sleep(200);
+        if(frontsensor.getDistance(DistanceUnit.CM) < 50){
+          level = 1;
+        }
+        if(level == 0){
+          level = 3;
+        }
+        
       }
       
       
